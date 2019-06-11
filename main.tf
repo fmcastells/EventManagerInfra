@@ -1,3 +1,11 @@
+terraform {
+  backend "s3" {
+    bucket = "bncpd-tf-lab3-12015"
+    key    = "bncpdlab3vm12015tfstate"
+    region = "eu-west-1"
+  }
+}
+
 variable "region" {
   default = "us-west-2"
 }
@@ -57,8 +65,8 @@ resource "aws_route_table_association" "public_route_assoc_a" {
   route_table_id = "${aws_route_table.public_rt.id}"
 }
 
-resource "aws_key_pair" "francis_key" {
-  key_name   = "francis_key"
+resource "aws_key_pair" "yakine_key" {
+  key_name   = "yakine_key"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDGOP1cg7AHC/N1eImga+VLHzLq0OFAx7cwot/Ft/4s7iB1EGrV7nOrMD36x0NKYq/WNez8wsl8OIUWHuuiSxORnL3fd5xW6K287BKZh1OYbQw4E/0W1OYNnhiweqVfHNkU74Q7XG7/yLB+nzsj3Smg2BQA5Ny6uDyOtcwstiWLyHbWDCkmR0ljUF7/hB+q/FcijJaqdos2ziY6HIiXx8oQ6OKi+FZAPtJ+XZDKpGS/xyt1CkEGLHJXkuBOgI5rJSMH/3EIcexjC/PyfgrdaBLsd5SpL2MrVYj1OKS3alJod3UHWiIe6yMhVYSEKAcrUW7Kom16xpL009WvmP6A4AGp simf003@C02YJ0KMJG5H.local"
 }
 
@@ -112,7 +120,7 @@ resource "aws_security_group" "allow_all_out_ipv4" {
 
 resource "aws_instance" "webservers" {
   ami           = "${data.aws_ami.ubuntu.id}"
-  key_name      = "${aws_key_pair.francis_key.key_name}"
+  key_name      = "${aws_key_pair.yakine_key.key_name}"
   instance_type = "t2.micro"
   count         = 1
 
