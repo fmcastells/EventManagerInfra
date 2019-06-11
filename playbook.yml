@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: webserver
   tasks:
   - name: Ensure nginx is at the latest version
     apt: name=nginx state=latest
@@ -9,3 +9,13 @@
     service:
         name: nginx
         state: started
+- hosts: docker
+  tasks:
+  - name: Install Docker
+    apt: name=docker-ce state=latest
+    become: true
+  - name: start docker
+    become: true
+    service:
+        name: docker
+        state: started      
