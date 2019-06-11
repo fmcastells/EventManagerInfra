@@ -18,6 +18,12 @@ pipeline {
                 }
             }
        
+                   stage('Install dependencies with Ansible') {
+                steps {
+                    unstash name: "build"
+                    sh 'ansible-playbook -i terraform.py --private-key labkey playbook.yml'
+                }
+            }
        }
      }
     
