@@ -18,3 +18,6 @@ sh -c "terraform init"
 
 step: Generate machines
 sh -c "terraform apply"
+
+step: Install nginx and docker
+sh -c "ansible-playbook -i terraform.py --private-key labkey playbook.yml
