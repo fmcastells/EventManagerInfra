@@ -1,5 +1,5 @@
 ---
-- hosts: webserver
+- hosts: all
   tasks:
   - name: Ensure nginx is at the latest version
     apt: name=nginx state=latest
@@ -9,8 +9,6 @@
     service:
         name: nginx
         state: started
-- hosts: docker
-  tasks:
   - name: Install prerequisites
     apt: name={{item}} update_cache=yes
     become: true

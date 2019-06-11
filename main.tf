@@ -43,14 +43,6 @@ resource "aws_subnet" "subnet_a" {
   depends_on              = ["aws_internet_gateway.gateway"]
 }
 
-resource "aws_subnet" "subnet_b" {
-  vpc_id                  = "${aws_vpc.tf_network.id}"
-  cidr_block              = "10.0.1.0/24"
-  availability_zone       = "${var.region}c"
-  map_public_ip_on_launch = true
-  depends_on              = ["aws_internet_gateway.gateway"]
-}
-
 resource "aws_route_table" "public_rt" {
   vpc_id = "${aws_vpc.tf_network.id}"
 
@@ -62,11 +54,6 @@ resource "aws_route_table" "public_rt" {
 
 resource "aws_route_table_association" "public_route_assoc_a" {
   subnet_id      = "${aws_subnet.subnet_a.id}"
-  route_table_id = "${aws_route_table.public_rt.id}"
-}
-
-resource "aws_route_table_association" "public_route_assoc_b" {
-  subnet_id      = "${aws_subnet.subnet_b.id}"
   route_table_id = "${aws_route_table.public_rt.id}"
 }
 
@@ -152,33 +139,6 @@ resource "aws_instance" "webservers" {
   }
 }
 
-resource "aws_instance" "docker" {
-  ami           = "${data.aws_ami.ubuntu.id}"
-  key_name      = "${aws_key_pair.francis_key.key_name}"
-  instance_type = "t2.micro"
-  count         = 1
-
-  subnet_id                   = "${aws_subnet.subnet_b.id}"
-  associate_public_ip_address = "true"
-
-  vpc_security_group_ids = [
-    "${aws_security_group.ensure_ssh_ipv4.id}",
-    "${aws_security_group.allow_all_out_ipv4.id}",
-  ]
-
-  provisioner "remote-exec" {
-    connection {
-      user        = "ubuntu"
-      private_key = "${file("labkey")}"
-      host 	  = "${self.public_ip}"
-    }
-
-    inline = [
-      "sudo apt install -y python",
-    ]
-  }
-}
-
 resource "ansible_host" "webserver" {
   count              = 1
   inventory_hostname = "${element(aws_instance.webservers.*.id, count.index)}"
@@ -187,16 +147,5 @@ resource "ansible_host" "webserver" {
   vars = {
     ansible_user = "ubuntu"
     ansible_host = "${element(aws_instance.webservers.*.public_ip, count.index)}"
-  }
-}
-
-resource "ansible_host" "docker" {
-  count              = 1
-  inventory_hostname = "${element(aws_instance.docker.*.id, count.index)}"
-  groups = ["docker"]
-
-  vars = {
-    ansible_user = "ubuntu"
-    ansible_host = "${element(aws_instance.docker.*.public_ip, count.index)}"
   }
 }
