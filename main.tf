@@ -70,8 +70,8 @@ resource "aws_route_table_association" "public_route_assoc_b" {
   route_table_id = "${aws_route_table.public_rt.id}"
 }
 
-resource "aws_key_pair" "edgenda_key" {
-  key_name   = "ec2_instance_key_12015"
+resource "aws_key_pair" "francis_key" {
+  key_name   = "francis_key"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDGOP1cg7AHC/N1eImga+VLHzLq0OFAx7cwot/Ft/4s7iB1EGrV7nOrMD36x0NKYq/WNez8wsl8OIUWHuuiSxORnL3fd5xW6K287BKZh1OYbQw4E/0W1OYNnhiweqVfHNkU74Q7XG7/yLB+nzsj3Smg2BQA5Ny6uDyOtcwstiWLyHbWDCkmR0ljUF7/hB+q/FcijJaqdos2ziY6HIiXx8oQ6OKi+FZAPtJ+XZDKpGS/xyt1CkEGLHJXkuBOgI5rJSMH/3EIcexjC/PyfgrdaBLsd5SpL2MrVYj1OKS3alJod3UHWiIe6yMhVYSEKAcrUW7Kom16xpL009WvmP6A4AGp simf003@C02YJ0KMJG5H.local"
 }
 
@@ -125,7 +125,7 @@ resource "aws_security_group" "allow_all_out_ipv4" {
 
 resource "aws_instance" "webservers" {
   ami           = "${data.aws_ami.ubuntu.id}"
-  key_name      = "${aws_key_pair.edgenda_key.key_name}"
+  key_name      = "${aws_key_pair.francis_key.key_name}"
   instance_type = "t2.micro"
   count         = 1
 
@@ -142,7 +142,7 @@ resource "aws_instance" "webservers" {
   provisioner "remote-exec" {
     connection {
       user        = "ubuntu"
-      private_key = "${file("~/.ssh/id_rsa_lab")}"
+      private_key = "${file("labkey")}"
       host 	  = "${self.public_ip}"
     }
 
@@ -154,7 +154,7 @@ resource "aws_instance" "webservers" {
 
 resource "aws_instance" "docker" {
   ami           = "${data.aws_ami.ubuntu.id}"
-  key_name      = "${aws_key_pair.edgenda_key.key_name}"
+  key_name      = "${aws_key_pair.francis_key.key_name}"
   instance_type = "t2.micro"
   count         = 1
 
@@ -169,7 +169,7 @@ resource "aws_instance" "docker" {
   provisioner "remote-exec" {
     connection {
       user        = "ubuntu"
-      private_key = "${file("~/.ssh/id_rsa_lab")}"
+      private_key = "${file("labkey")}"
       host 	  = "${self.public_ip}"
     }
 
@@ -182,6 +182,7 @@ resource "aws_instance" "docker" {
 resource "ansible_host" "webserver" {
   count              = 1
   inventory_hostname = "${element(aws_instance.webservers.*.id, count.index)}"
+  groups = ["webserver"]
 
   vars = {
     ansible_user = "ubuntu"
@@ -192,6 +193,7 @@ resource "ansible_host" "webserver" {
 resource "ansible_host" "docker" {
   count              = 1
   inventory_hostname = "${element(aws_instance.docker.*.id, count.index)}"
+  groups = ["docker"]
 
   vars = {
     ansible_user = "ubuntu"
