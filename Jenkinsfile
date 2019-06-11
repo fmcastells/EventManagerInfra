@@ -6,7 +6,7 @@ pipeline {
             steps {
             checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '2e56e149-1a09-4640-845b-0aeff4b48fc2', url: 'git@github.com:fmcastells/EventManagerInfra.git']]])
             }
-
+        }
         stage('Set Terraform path') {
             steps {
                 sh "docker run -i hashicorp/terraform:light version"
