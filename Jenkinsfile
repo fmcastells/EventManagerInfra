@@ -21,6 +21,7 @@ pipeline {
                    stage('Install dependencies with Ansible') {
                 steps {
                     unstash name: "build"
+                    sh "chmod 777 terraform.py; chmod 600 labkey"
                     sh 'ansible-playbook -i terraform.py --private-key labkey playbook.yml'
                 }
             }
