@@ -11,7 +11,7 @@ step: Unzip terrafor ansible:
 sh - "unzip terraform-provider-ansible-linux_amd64.zip"
 
 step: Move package to right folder:
-sh -c "mv terraform-provider-ansible-linux_amd64 ~/.terraform.d/plugins/"
+sh -c "mv linux_amd64 ~/.terraform.d/plugins/"
 
 step: Prepare to generate machine
 sh -c "terraform init"
@@ -20,4 +20,4 @@ step: Generate machines
 sh -c "terraform apply"
 
 step: Install nginx and docker
-sh -c "ansible-playbook -i terraform.py --private-key labkey playbook.yml
+sh -c "ansible-playbook -i terraform.py --private-key labkey playbook.yml"
